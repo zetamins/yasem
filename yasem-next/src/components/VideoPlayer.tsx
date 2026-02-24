@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./VideoPlayer.module.css";
 
 interface PlayerCommand {
-  type: "play" | "pause" | "stop" | "setVolume" | "seek" | "setLoop" | "setMute";
+  type: "play" | "pause" | "stop" | "setVolume" | "seek" | "setLoop" | "setMute" | "setSpeed" | "setAspect";
   payload?: unknown;
 }
 
@@ -19,16 +19,30 @@ interface PlayerStateInfo {
 interface Props {
   url: string;
   command: PlayerCommand | null;
+  aspectRatio?: string;
   onStateChange?: (state: PlayerStateInfo) => void;
 }
 
-export default function VideoPlayer({ url, command, onStateChange }: Props) {
+const ASPECT_RATIO_MAP: Record<string, string> = {
+  auto: "auto",
+  "1:1": "1 / 1",
+  "5:4": "5 / 4",
+  "4:3": "4 / 3",
+  "16:9": "16 / 9",
+  "16:10": "16 / 10",
+  fill: "auto",
+  expanding: "auto",
+};
+
+export default function VideoPlayer({ url, command, aspectRatio = "auto", onStateChange }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const [volume, setVolume] = useState(100);
   const [muted, setMuted] = useState(false);
   const [state, setState] = useState<"stopped" | "playing" | "paused">("stopped");
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [currentAspect, setCurrentAspect] = useState(aspectRatio);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -37,11 +51,11 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
     const onPlay = () => setState("playing");
     const onPause = () => setState("paused");
     const onEnded = () => setState("stopped");
-    const onTimeUpdate = () => {
-      setPosition(Math.floor(video.currentTime * 1000));
-    };
-    const onDurationChange = () => {
-      setDuration(Math.floor((video.duration || 0) * 1000));
+    const onTimeUpdate = () => setPosition(Math.floor(video.currentTime * 1000));
+    const onDurationChange = () => setDuration(Math.floor((video.duration || 0) * 1000));
+    const onVolumeChange = () => {
+      setVolume(Math.round(video.volume * 100));
+      setMuted(video.muted);
     };
 
     video.addEventListener("play", onPlay);
@@ -49,6 +63,7 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
     video.addEventListener("ended", onEnded);
     video.addEventListener("timeupdate", onTimeUpdate);
     video.addEventListener("durationchange", onDurationChange);
+    video.addEventListener("volumechange", onVolumeChange);
 
     return () => {
       video.removeEventListener("play", onPlay);
@@ -56,6 +71,7 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("timeupdate", onTimeUpdate);
       video.removeEventListener("durationchange", onDurationChange);
+      video.removeEventListener("volumechange", onVolumeChange);
     };
   }, []);
 
@@ -111,6 +127,16 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
         video.loop = loop !== 0;
         break;
       }
+      case "setSpeed": {
+        const speed = (command.payload as { speed: number }).speed;
+        video.playbackRate = speed;
+        break;
+      }
+      case "setAspect": {
+        const aspect = (command.payload as { aspect: string }).aspect;
+        setCurrentAspect(aspect);
+        break;
+      }
     }
   }, [command]);
 
@@ -125,12 +151,29 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
 
   const progressPercent = duration > 0 ? (position / duration) * 100 : 0;
 
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const video = videoRef.current;
+    if (!video || !progressRef.current || duration === 0) return;
+    const rect = progressRef.current.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    video.currentTime = ratio * (duration / 1000);
+  };
+
+  const cssAspect = currentAspect === "fill"
+    ? undefined
+    : (ASPECT_RATIO_MAP[currentAspect] ?? "auto");
+
+  const videoStyle = currentAspect === "fill"
+    ? { width: "100%", height: "100%", objectFit: "fill" as const }
+    : { aspectRatio: cssAspect };
+
   return (
     <div className={styles.playerContainer}>
       <video
         ref={videoRef}
         id="yasem-player"
         className={styles.video}
+        style={videoStyle}
         controls={false}
         playsInline
         src={url}
@@ -138,17 +181,48 @@ export default function VideoPlayer({ url, command, onStateChange }: Props) {
 
       {state !== "stopped" && (
         <div className={styles.controls}>
-          <div className={styles.progressBar}>
+          <div
+            ref={progressRef}
+            className={styles.progressBar}
+            onClick={handleProgressClick}
+            title="Click to seek"
+          >
             <div
               className={styles.progressFill}
               style={{ width: `${progressPercent}%` }}
             />
           </div>
           <div className={styles.controlsRow}>
-            <span className={styles.time}>
-              {formatTime(position)} / {formatTime(duration)}
-            </span>
-            <div className={styles.volumeControl}>
+            <div className={styles.leftControls}>
+              <button
+                className={styles.ctrlBtn}
+                onClick={() => {
+                  const video = videoRef.current;
+                  if (!video) return;
+                  if (video.paused) video.play().catch(() => {});
+                  else video.pause();
+                }}
+              >
+                {state === "playing" ? "⏸" : "▶"}
+              </button>
+              <button
+                className={styles.ctrlBtn}
+                onClick={() => {
+                  const video = videoRef.current;
+                  if (!video) return;
+                  video.pause();
+                  video.currentTime = 0;
+                  video.src = "";
+                  setState("stopped");
+                }}
+              >
+                ⏹
+              </button>
+              <span className={styles.time}>
+                {formatTime(position)} / {formatTime(duration)}
+              </span>
+            </div>
+            <div className={styles.rightControls}>
               <button
                 className={styles.muteBtn}
                 onClick={() => {

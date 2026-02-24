@@ -13,6 +13,12 @@ const DUNEHD_SUBMODELS: StbSubmodel[] = [
   { id: "Dune HD Connect", name: "Dune HD Connect", logo: "/img/dune-hd-102.png" },
 ];
 
+const SAMSUNG_SUBMODELS: StbSubmodel[] = [
+  { id: "Samsung SmartTV 2015", name: "Samsung SmartTV 2015", logo: "/img/mag-generic.png" },
+  { id: "Samsung SmartTV 2016", name: "Samsung SmartTV 2016", logo: "/img/mag-generic.png" },
+  { id: "Samsung SmartTV Tizen", name: "Samsung SmartTV Tizen", logo: "/img/mag-generic.png" },
+];
+
 const REGISTERED_PLUGINS: StbPluginDefinition[] = [
   {
     id: "mag-api",
@@ -25,6 +31,12 @@ const REGISTERED_PLUGINS: StbPluginDefinition[] = [
     name: "DuneHD STB API",
     classId: "dunehd",
     submodels: DUNEHD_SUBMODELS,
+  },
+  {
+    id: "samsung-smarttv-api",
+    name: "Samsung SmartTV API",
+    classId: "samsung",
+    submodels: SAMSUNG_SUBMODELS,
   },
 ];
 

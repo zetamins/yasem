@@ -11,16 +11,17 @@ interface Props {
   portalUrl: string;
   classId: string;
   submodel: string;
+  aspectRatio?: string;
 }
 
 type TopWidget = "browser" | "video";
 
 interface PlayerCommand {
-  type: "play" | "pause" | "stop" | "setVolume" | "seek" | "setLoop" | "setMute";
+  type: "play" | "pause" | "stop" | "setVolume" | "seek" | "setLoop" | "setMute" | "setSpeed" | "setAspect";
   payload?: unknown;
 }
 
-export default function PortalViewer({ profileId, profileName, portalUrl, classId, submodel }: Props) {
+export default function PortalViewer({ profileId, profileName, portalUrl, classId, submodel, aspectRatio = "auto" }: Props) {
   const router = useRouter();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [topWidget, setTopWidget] = useState<TopWidget>("browser");
@@ -32,12 +33,12 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
   playerCmdRef.current = setPlayerCmd;
 
   const sendToPortal = useCallback((js: string) => {
-    if (iframeRef.current?.contentWindow) {
-      try {
-        iframeRef.current.contentWindow.eval(js);
-      } catch {
-        console.warn("Could not eval in portal frame:", js);
-      }
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    try {
+      (win as Window & { eval: (code: string) => void }).eval(js);
+    } catch {
+      console.warn("Could not eval in portal frame:", js);
     }
   }, []);
 
@@ -196,7 +197,7 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
                 })();
               `;
               try {
-                iframe.contentWindow.eval(inject);
+                (iframe.contentWindow as Window & { eval: (code: string) => void }).eval(inject);
               } catch {
                 console.warn("[YASEM] Could not inject portal script (cross-origin)");
               }
@@ -212,6 +213,7 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
         <VideoPlayer
           url={playerUrl}
           command={playerCmd}
+          aspectRatio={aspectRatio}
           onStateChange={(state) => {
             sendToPortal(`
               window.dispatchEvent(new CustomEvent('yasem:playerState', { detail: ${JSON.stringify(state)} }));

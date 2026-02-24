@@ -299,6 +299,57 @@ function getConfigurationForClass(
     };
   }
 
+  if (classId === "samsung") {
+    return {
+      groups: [
+        {
+          title: "Profile",
+          options: [
+            {
+              tag: "profile",
+              name: "name",
+              title: "Profile name",
+              value: getValue("profile", "name", profile.name),
+              type: "string",
+            },
+            {
+              tag: "profile",
+              name: "portal",
+              title: "Portal URL",
+              value: getValue("profile", "portal", profile.portal),
+              type: "string",
+            },
+          ],
+        },
+        {
+          title: "Device",
+          options: [
+            {
+              tag: "profile",
+              name: "submodel",
+              title: "Device model",
+              value: getValue("profile", "submodel", profile.submodel),
+              type: "select",
+              options: {
+                "Samsung SmartTV 2015": "Samsung SmartTV 2015",
+                "Samsung SmartTV 2016": "Samsung SmartTV 2016",
+                "Samsung SmartTV Tizen": "Samsung SmartTV Tizen",
+              },
+            },
+            {
+              tag: "samsung",
+              name: "tizen_version",
+              title: "Tizen version",
+              comment: "SmartTV platform API version (e.g. 2.3, 3.0, 5.0)",
+              value: getValue("samsung", "tizen_version", "2.3"),
+              type: "string",
+            },
+          ],
+        },
+      ],
+    };
+  }
+
   return {
     groups: [
       {

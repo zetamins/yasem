@@ -1,18 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProfileById } from "@/lib/profileStore";
 
-const MAG_USER_AGENTS: Record<string, string> = {
-  MAG250: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1",
-  MAG255: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1",
-  MAG256: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1",
-  AuraHD: "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1",
+const MAG_UA = "Mozilla/5.0 (Linux; U; Linux) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.0.0 Safari/537.36 SMART-TV";
+const SAMSUNG_UA = "Mozilla/5.0 (SMART-TV; LINUX; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1";
+const DUNEHD_UA = "Mozilla/5.0 (DuneHD; Linux) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.0.0 Safari/537.36";
+
+const USER_AGENTS: Record<string, Record<string, string>> = {
+  mag: {
+    MAG250: MAG_UA,
+    MAG255: MAG_UA,
+    MAG256: MAG_UA,
+    MAG275: MAG_UA,
+    AuraHD: MAG_UA,
+  },
+  samsung: {
+    "Samsung SmartTV 2015": SAMSUNG_UA,
+    "Samsung SmartTV 2016": SAMSUNG_UA,
+    "Samsung SmartTV Tizen": SAMSUNG_UA,
+  },
+  dunehd: {
+    "Dune HD TV-102": DUNEHD_UA,
+    "Dune HD Connect": DUNEHD_UA,
+  },
 };
 
 function getDefaultUserAgent(classId: string, submodel: string): string {
-  if (classId === "mag") {
-    return MAG_USER_AGENTS[submodel] || MAG_USER_AGENTS.MAG250;
-  }
-  return "Mozilla/5.0 (SMART-TV; Linux; Tizen 5.0) AppleWebKit/538.1 (KHTML, like Gecko) Version/5.0 TV Safari/538.1";
+  return USER_AGENTS[classId]?.[submodel] ?? USER_AGENTS[classId]?.[Object.keys(USER_AGENTS[classId] ?? {})[0]] ?? MAG_UA;
 }
 
 function rewriteHtmlForProxy(html: string, baseUrl: string, profileId: string): string {

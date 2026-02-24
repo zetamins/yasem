@@ -12,6 +12,8 @@ export default async function PortalPage({ params }: Props) {
     notFound();
   }
 
+  const aspectRatio = profile.config["media/aspect_ratio"] || "auto";
+
   return (
     <PortalViewer
       profileId={profile.id}
@@ -19,6 +21,7 @@ export default async function PortalPage({ params }: Props) {
       portalUrl={profile.portal}
       classId={profile.classId}
       submodel={profile.submodel}
+      aspectRatio={aspectRatio}
     />
   );
 }

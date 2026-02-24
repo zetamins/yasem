@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./ProfilesPage.module.css";
 import ProfileCard from "./ProfileCard";
@@ -27,6 +27,7 @@ export default function ProfilesPage() {
   const [currentPage, setCurrentPage] = useState<Page>("profiles");
   const [appInfo, setAppInfo] = useState({ version: "", copyright: "" });
   const [loading, setLoading] = useState(true);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const loadProfiles = useCallback(async () => {
     try {
@@ -183,6 +184,47 @@ export default function ProfilesPage() {
 
       <footer className={styles.footer}>
         <span className={styles.copyright}>{appInfo.copyright}</span>
+        <div className={styles.footerActions}>
+          <button
+            className={styles.footerBtn}
+            onClick={() => { window.location.href = "/api/profiles/export"; }}
+            title="Export all profiles to JSON"
+          >
+            ↓ Export
+          </button>
+          <button
+            className={styles.footerBtn}
+            onClick={() => importInputRef.current?.click()}
+            title="Import profiles from JSON"
+          >
+            ↑ Import
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".json,application/json"
+            style={{ display: "none" }}
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              try {
+                const text = await file.text();
+                const data = JSON.parse(text) as unknown;
+                const res = await fetch("/api/profiles/import", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(data),
+                });
+                const result = await res.json() as { added: number; skipped: number };
+                alert(`Imported ${result.added} profile(s), skipped ${result.skipped}.`);
+                await loadProfiles();
+              } catch {
+                alert("Failed to import profiles. Please check the file format.");
+              }
+              e.target.value = "";
+            }}
+          />
+        </div>
         <span className={styles.version}>{appInfo.version}</span>
       </footer>
 

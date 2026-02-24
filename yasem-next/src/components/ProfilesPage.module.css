@@ -77,12 +77,35 @@
 .footer {
   padding: 12px 40px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   border-top: 1px solid #1e2d50;
   font-size: 0.8rem;
   color: #5ea5c8;
   padding-bottom: 60px;
+  gap: 12px;
 }
 
 .copyright {}
 .version {}
+
+.footerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.footerBtn {
+  background: transparent;
+  border: 1px solid #1e2d50;
+  color: #8ab0c8;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.footerBtn:hover {
+  border-color: #5ea5c8;
+  color: #5ea5c8;
+}
