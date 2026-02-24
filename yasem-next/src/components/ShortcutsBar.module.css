@@ -1,0 +1,39 @@
+.bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background: #060d1a;
+  border-top: 1px solid #1e2d50;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 24px;
+  z-index: 100;
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  padding: 0 8px;
+  background: #1e2d50;
+}
+
+.title {
+  font-size: 0.9rem;
+  color: #b5d9ea;
+}

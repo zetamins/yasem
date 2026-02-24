@@ -1,0 +1,25 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - heading "YASEM" [level=1] [ref=e4]
+      - generic [ref=e5]: Yet Another STB EMulator
+    - main [ref=e6]:
+      - paragraph [ref=e7]: Loading profiles…
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - generic [ref=e10]: F1
+        - generic [ref=e11]: Help
+      - generic [ref=e12]:
+        - generic [ref=e13]: F2
+        - generic [ref=e14]: Edit profile
+      - generic [ref=e15]:
+        - generic [ref=e16]: F3
+        - generic [ref=e17]: New profile
+      - generic [ref=e18]:
+        - generic [ref=e19]: F4
+        - generic [ref=e20]: Remove profile
+    - contentinfo [ref=e21]:
+      - generic [ref=e22]:
+        - button "↓ Export" [ref=e23] [cursor=pointer]
+        - button "↑ Import" [ref=e24] [cursor=pointer]
+  - alert [ref=e25]

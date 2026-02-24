@@ -1,0 +1,104 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #0d1a2e;
+  border: 1px solid #5ea5c8;
+  border-radius: 16px;
+  padding: 32px;
+  min-width: 600px;
+  max-width: 900px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.header h2 {
+  font-size: 1.6rem;
+  color: #5ea5c8;
+}
+
+.close {
+  background: transparent;
+  border: 1px solid #5ea5c8;
+  color: #5ea5c8;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close:hover {
+  background: #1e2d50;
+}
+
+.hint {
+  color: #8ab0c8;
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.typeCard {
+  background: transparent;
+  border: 1px solid #31708f;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: coral;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.typeCard:hover,
+.typeCard.selected {
+  border-color: #5ea5c8;
+  box-shadow: 0 0 12px #5ea5c855;
+}
+
+.typeCard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.logo {
+  width: 80px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.typeName {
+  font-size: 0.95rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.pluginName {
+  font-size: 0.75rem;
+  color: #8ab0c8;
+}
