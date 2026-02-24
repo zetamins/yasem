@@ -1,0 +1,80 @@
+.playerContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  padding: 24px 16px 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.playerContainer:hover .controls {
+  opacity: 1;
+}
+
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.progressFill {
+  height: 100%;
+  background: #5ea5c8;
+  border-radius: 2px;
+  transition: width 0.5s linear;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.time {
+  font-size: 0.9rem;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.volumeControl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.muteBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.volumeSlider {
+  width: 80px;
+  accent-color: #5ea5c8;
+}

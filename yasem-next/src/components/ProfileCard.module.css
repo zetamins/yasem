@@ -1,0 +1,73 @@
+.card {
+  background: transparent;
+  border: 1px solid #31708f;
+  border-radius: 16px;
+  box-shadow: inset 0 0 12px 6px #31708f33;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  color: coral;
+  min-height: 220px;
+  width: 100%;
+}
+
+.card:hover,
+.card.selected {
+  border-color: #5ea5c8;
+  box-shadow: inset 0 0 20px 10px #5ea5c855;
+  outline: none;
+}
+
+.card:focus {
+  outline: 2px solid #5ea5c8;
+  outline-offset: 2px;
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.info {
+  width: 100%;
+  text-align: center;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: coral;
+}
+
+.submodel {
+  font-size: 0.8rem;
+  color: #8ab0c8;
+  margin-top: 2px;
+}
+
+.url {
+  font-size: 0.7rem;
+  color: #5ea5c8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  margin: 0 auto;
+  margin-top: 4px;
+}
