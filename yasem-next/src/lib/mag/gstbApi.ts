@@ -102,6 +102,12 @@ export function buildGStbScript(
   function _triggerEvent(name, data) {
     var event = new CustomEvent('yasem:' + name, { detail: data });
     window.dispatchEvent(event);
+    // Also send to parent window for cross-frame communication
+    if (window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({ type: 'yasem:' + name, payload: data }, '*');
+      } catch(e) {}
+    }
     if (typeof window.stbEvent === 'function') {
       window.stbEvent(name, data);
     }
