@@ -7,6 +7,7 @@ import ProfileCard from "./ProfileCard";
 import NewProfileModal from "./NewProfileModal";
 import HelpPanel from "./HelpPanel";
 import ShortcutsBar from "./ShortcutsBar";
+import { preventFunctionKeyDefaults, CAPTURE_LISTENER_OPTIONS } from "@/lib/keyboard";
 
 interface ProfileInfo {
   id: string;
@@ -77,59 +78,79 @@ export default function ProfilesPage() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (showNewProfileModal) return;
+      // Always prevent default browser actions for F1-F4, even when modal is open
+      // This prevents Firefox from opening Help (F1) or other default actions
+      const isFnKey = preventFunctionKeyDefaults(e, [1, 2, 3, 4]);
+
+      if (showNewProfileModal) {
+        // If modal is open, don't process these keys but still prevent defaults
+        return;
+      }
 
       const total = profiles.length;
       if (total === 0) return;
 
       const COLS = 5;
 
-      switch (e.key) {
+      // Normalize key detection: prefer e.code for function keys, fall back to e.key
+      const key = e.code || e.key;
+
+      switch (key) {
         case "ArrowRight":
           e.preventDefault();
+          e.stopPropagation();
           setSelectedIndex((i) => (i + 1) % total);
           break;
         case "ArrowLeft":
           e.preventDefault();
+          e.stopPropagation();
           setSelectedIndex((i) => (i - 1 + total) % total);
           break;
         case "ArrowDown":
           e.preventDefault();
+          e.stopPropagation();
           setSelectedIndex((i) => Math.min(i + COLS, total - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
+          e.stopPropagation();
           setSelectedIndex((i) => Math.max(i - COLS, 0));
           break;
         case "Enter":
           e.preventDefault();
+          e.stopPropagation();
           if (selectedProfile) loadProfile(selectedProfile.id);
           break;
         case "F1":
           e.preventDefault();
+          e.stopPropagation();
           setCurrentPage((p) => (p === "help" ? "profiles" : "help"));
           break;
         case "F2":
           e.preventDefault();
+          e.stopPropagation();
           if (selectedProfile) editProfile(selectedProfile.id);
           break;
         case "F3":
           e.preventDefault();
+          e.stopPropagation();
           setShowNewProfileModal(true);
           break;
         case "F4":
           e.preventDefault();
+          e.stopPropagation();
           if (selectedProfile) removeProfile(selectedProfile.id, selectedProfile.name);
           break;
         case "Escape":
           e.preventDefault();
+          e.stopPropagation();
           if (currentPage === "help") setCurrentPage("profiles");
           break;
       }
     };
 
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
+    return () => window.removeEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
   }, [profiles, selectedIndex, selectedProfile, showNewProfileModal, currentPage, loadProfile, editProfile, removeProfile]);
 
   const shortcuts =

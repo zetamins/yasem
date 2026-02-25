@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ProfileConfiguration, ConfigOption } from "@/types";
 import styles from "./ProfileConfigPage.module.css";
 import ShortcutsBar from "./ShortcutsBar";
+import { preventFunctionKeyDefaults, CAPTURE_LISTENER_OPTIONS } from "@/lib/keyboard";
 
 interface Props {
   profileId: string;
@@ -48,19 +49,27 @@ export default function ProfileConfigPage({ profileId, profileName, config }: Pr
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      switch (e.key) {
+      // Always prevent default browser actions for F1-F4
+      preventFunctionKeyDefaults(e, [1, 2, 3, 4]);
+
+      // Normalize key detection: prefer e.code for function keys, fall back to e.key
+      const key = e.code || e.key;
+
+      switch (key) {
         case "F2":
           e.preventDefault();
+          e.stopPropagation();
           saveProfile();
           break;
         case "Escape":
           e.preventDefault();
+          e.stopPropagation();
           router.back();
           break;
       }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
+    return () => window.removeEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
   });
 
   return (

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./PortalViewer.module.css";
 import VideoPlayer from "./VideoPlayer";
+import { preventFunctionKeyDefaults, CAPTURE_LISTENER_OPTIONS } from "@/lib/keyboard";
 
 interface Props {
   profileId: string;
@@ -95,12 +96,22 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Backspace" && !e.defaultPrevented) {
+      // Always prevent default browser actions for F1-F4
+      // This prevents Firefox from opening Help (F1) or other default actions
+      preventFunctionKeyDefaults(e, [1, 2, 3, 4]);
+
+      // Normalize key detection: prefer e.code for function keys, fall back to e.key
+      const key = e.code || e.key;
+
+      if (key === "Backspace" && !e.defaultPrevented) {
+        e.preventDefault();
+        e.stopPropagation();
         router.push("/");
         return;
       }
-      if (e.key === "F11") {
+      if (key === "F11") {
         e.preventDefault();
+        e.stopPropagation();
         setFullscreen((f) => {
           if (!f) {
             document.documentElement.requestFullscreen?.().catch(() => {});
@@ -133,8 +144,10 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
         Backspace: 8,
       };
 
-      const keyCode = RC_MAP[e.key];
+      const keyCode = RC_MAP[key];
       if (keyCode !== undefined) {
+        e.preventDefault();
+        e.stopPropagation();
         const js = `
           (function() {
             var ev = new KeyboardEvent('keydown', {
@@ -151,8 +164,8 @@ export default function PortalViewer({ profileId, profileName, portalUrl, classI
       }
     };
 
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
+    return () => window.removeEventListener("keydown", onKey, CAPTURE_LISTENER_OPTIONS);
   }, [router, sendToPortal]);
 
   const scriptUrl = `/api/portal-script?profileId=${encodeURIComponent(profileId)}`;
